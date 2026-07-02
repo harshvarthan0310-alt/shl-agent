@@ -12,9 +12,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    key = os.getenv("Groq_API_KEY", os.getenv("GROQ_API_KEY", ""))
+    return {
+        "status": "ok",
+        "has_groq_key": bool(key),
+        "groq_key_prefix": key[:7] if key else "none"
+    }
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):

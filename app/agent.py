@@ -73,7 +73,7 @@ def process_chat(messages: list[Message]) -> ChatResponse:
         retrieved_items: list[dict] = []
 
         if mode in ("recommend", "refine"):
-            retrieved_items = _catalog.search(queries, top_k=25, filters=filters)
+            retrieved_items = _catalog.search(queries, top_k=12, filters=filters)
             if mode == "refine":
                 # Also include items from prior recommendations
                 for name in _extract_previous_rec_names(messages):
@@ -95,12 +95,12 @@ def process_chat(messages: list[Message]) -> ChatResponse:
             # Still retrieve some items so the LLM has context to work with
             # if the user gives enough info in one message
             if queries:
-                retrieved_items = _catalog.search(queries, top_k=15)
+                retrieved_items = _catalog.search(queries, top_k=6)
             else:
                 # Get a diverse sample for general context
                 all_user = " ".join(m.content for m in messages if m.role == "user")
                 if len(all_user.strip()) > 5:
-                    retrieved_items = _catalog.search([all_user], top_k=10)
+                    retrieved_items = _catalog.search([all_user], top_k=6)
 
         # ── Stage 3: Single LLM call ────────────────────────────────────
         catalog_ctx = _format_catalog_context(retrieved_items)
